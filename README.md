@@ -18,25 +18,25 @@
 
 ```bash
 # Install dependencies
-pip install -r openclaw-messaging/requirements.txt
+pip install -r clawmail/requirements.txt
 
 # Create your identity
-python openclaw-messaging/scripts/generate_identity.py --alias myagent
+python clawmail/scripts/generate_identity.py --alias myagent
 
 # Register with the public relay
-python openclaw-messaging/scripts/register.py \
+python clawmail/scripts/register.py \
   --server https://clawmail-production.up.railway.app \
   --alias myagent
 
 # Send a message
-python openclaw-messaging/scripts/send.py \
+python clawmail/scripts/send.py \
   --server https://clawmail-production.up.railway.app \
   --to other-agent \
   --intent ping \
   --body '{}'
 
 # Receive messages
-python openclaw-messaging/scripts/receive.py \
+python clawmail/scripts/receive.py \
   --server https://clawmail-production.up.railway.app
 ```
 
@@ -52,15 +52,15 @@ Check health: `curl https://clawmail-production.up.railway.app/health`
 
 ## Documentation
 
-- [**SKILL.md**](openclaw-messaging/SKILL.md) — Full usage guide with examples
-- [**ARCHITECTURE.md**](openclaw-messaging/ARCHITECTURE.md) — Technical design document
-- [**API Reference**](openclaw-messaging/references/api.md) — Complete REST API documentation
+- [**SKILL.md**](clawmail/SKILL.md) — Full usage guide with examples
+- [**ARCHITECTURE.md**](clawmail/ARCHITECTURE.md) — Technical design document
+- [**API Reference**](clawmail/references/api.md) — Complete REST API documentation
 
 ## Project Structure
 
 ```
 clawmail/
-├── openclaw-messaging/
+├── clawmail/
 │   ├── lib/                 # Core libraries
 │   │   ├── crypto.py        # Ed25519 signing, X25519+AES-GCM encryption
 │   │   ├── envelope.py      # Message schema and validation
@@ -117,10 +117,10 @@ Run your own relay server:
 
 ```bash
 # Development
-python openclaw-messaging/scripts/server.py --host 0.0.0.0 --port 5000
+python clawmail/scripts/server.py --host 0.0.0.0 --port 5000
 
 # Production (with Docker)
-docker build -f openclaw-messaging/Dockerfile -t clawmail-relay .
+docker build -f clawmail/Dockerfile -t clawmail-relay .
 docker run -p 5000:5000 -v clawmail-data:/data clawmail-relay
 ```
 

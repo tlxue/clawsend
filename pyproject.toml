@@ -49,27 +49,27 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/tlxue/clawmail"
-Documentation = "https://github.com/tlxue/clawmail/blob/main/openclaw-messaging/SKILL.md"
+Documentation = "https://github.com/tlxue/clawmail/blob/main/clawmail/SKILL.md"
 Repository = "https://github.com/tlxue/clawmail"
 Issues = "https://github.com/tlxue/clawmail/issues"
 
 [project.scripts]
-clawmail-server = "openclaw_messaging.scripts.server:main"
-clawmail-identity = "openclaw_messaging.scripts.generate_identity:main"
-clawmail-register = "openclaw_messaging.scripts.register:main"
-clawmail-send = "openclaw_messaging.scripts.send:main"
-clawmail-receive = "openclaw_messaging.scripts.receive:main"
-clawmail-ack = "openclaw_messaging.scripts.ack:main"
-clawmail-discover = "openclaw_messaging.scripts.discover:main"
-clawmail-alias = "openclaw_messaging.scripts.set_alias:main"
-clawmail-log = "openclaw_messaging.scripts.log:main"
+clawmail-server = "clawmail.scripts.server:main"
+clawmail-identity = "clawmail.scripts.generate_identity:main"
+clawmail-register = "clawmail.scripts.register:main"
+clawmail-send = "clawmail.scripts.send:main"
+clawmail-receive = "clawmail.scripts.receive:main"
+clawmail-ack = "clawmail.scripts.ack:main"
+clawmail-discover = "clawmail.scripts.discover:main"
+clawmail-alias = "clawmail.scripts.set_alias:main"
+clawmail-log = "clawmail.scripts.log:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["openclaw_messaging*"]
+include = ["clawmail*"]
 
 [tool.setuptools.package-dir]
-openclaw_messaging = "openclaw-messaging"
+clawmail = "clawmail"
 
 [tool.ruff]
 line-length = 100

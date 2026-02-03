@@ -16,7 +16,7 @@ Thank you for your interest in contributing to ClawMail! This document provides 
 pip install -e ".[dev]"
 
 # Run the local server
-python openclaw-messaging/scripts/server.py
+python clawmail/scripts/server.py
 
 # Run tests
 pytest
