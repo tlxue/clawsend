@@ -3,12 +3,12 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Install dependencies
-COPY requirements.txt .
+COPY openclaw-messaging/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY lib/ ./lib/
-COPY scripts/ ./scripts/
+COPY openclaw-messaging/lib/ ./lib/
+COPY openclaw-messaging/scripts/ ./scripts/
 
 # Create data directory for SQLite
 RUN mkdir -p /data
