@@ -917,22 +917,17 @@ def cleanup_expired():
 
 
 # =============================================================================
-# Main
+# Initialization (for gunicorn/production)
 # =============================================================================
 
-def main():
-    """Run the server."""
-    import argparse
+_initialized = False
 
-    parser = argparse.ArgumentParser(description='ClawHub Relay Server')
-    parser.add_argument('--host', default='127.0.0.1', help='Host to bind to')
-    parser.add_argument('--port', type=int, default=5000, help='Port to bind to')
-    parser.add_argument('--debug', action='store_true', help='Enable debug mode')
-    parser.add_argument('--db', default='clawhub.db', help='Database path')
-    args = parser.parse_args()
-
-    global DATABASE_PATH
-    DATABASE_PATH = args.db
+def initialize():
+    """Initialize database and background tasks. Safe to call multiple times."""
+    global _initialized
+    if _initialized:
+        return
+    _initialized = True
 
     # Initialize database
     init_db()
@@ -942,6 +937,32 @@ def main():
     cleanup_thread = threading.Thread(target=cleanup_expired, daemon=True)
     cleanup_thread.start()
     print("Background cleanup started", file=sys.stderr)
+
+
+# Auto-initialize when imported (for gunicorn)
+initialize()
+
+
+# =============================================================================
+# Main (for direct execution)
+# =============================================================================
+
+def main():
+    """Run the server directly (development mode)."""
+    import argparse
+
+    parser = argparse.ArgumentParser(description='ClawHub Relay Server')
+    parser.add_argument('--host', default='127.0.0.1', help='Host to bind to')
+    parser.add_argument('--port', type=int, default=5000, help='Port to bind to')
+    parser.add_argument('--debug', action='store_true', help='Enable debug mode')
+    parser.add_argument('--db', help='Database path (overrides CLAWHUB_DB env var)')
+    args = parser.parse_args()
+
+    if args.db:
+        global DATABASE_PATH, _initialized
+        DATABASE_PATH = args.db
+        _initialized = False  # Re-initialize with new path
+        initialize()
 
     # Run server
     print(f"Starting ClawHub relay on {args.host}:{args.port}", file=sys.stderr)

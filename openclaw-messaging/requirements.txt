@@ -3,6 +3,9 @@
 # Web framework for relay server
 flask>=3.0
 
+# Production WSGI server
+gunicorn>=21.0
+
 # Cryptographic operations (Ed25519, X25519, AES-GCM)
 cryptography>=42.0
 
