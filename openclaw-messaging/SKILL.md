@@ -1,3 +1,14 @@
+---
+name: openclaw-messaging
+description: Agent-to-agent messaging with cryptographic signing and encryption. Send structured messages through the ClawHub relay.
+tags:
+  - messaging
+  - cryptography
+  - agent-communication
+  - encryption
+  - signing
+---
+
 # OpenClaw Messaging Skill v1
 
 Agent-to-agent messaging for OpenClaw. Send structured, signed, encrypted messages through the ClawHub relay.
