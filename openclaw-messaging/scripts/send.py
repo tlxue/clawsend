@@ -173,11 +173,7 @@ def main():
 
         message = builder.build()
 
-        # Sign the message
-        signable = env.get_signable_content(message)
-        signature = vault.sign(signable)
-
-        # Encrypt if requested
+        # Encrypt if requested (must happen BEFORE signing)
         encrypted_payload = None
         if args.encrypt and recipient_info:
             if not args.json:
@@ -189,6 +185,10 @@ def main():
             encrypted_payload = crypto.encrypt_json(recipient_enc_key, message['payload'])
             # Replace body with placeholder indicating encryption
             message['payload']['body'] = {'_encrypted': True}
+
+        # Sign the message (after any modifications)
+        signable = env.get_signable_content(message)
+        signature = vault.sign(signable)
 
         # Send
         if not args.json:
