@@ -13,27 +13,27 @@ ClawHub is the skill registry for OpenClaw. To publish this skill:
 
 ### Login
 
-Due to a redirect bug, use the `www` subdomain explicitly:
+Use `https://clawhub.ai` (without www):
 
 ```bash
-clawdhub auth login --token <YOUR_TOKEN> --no-browser --registry https://www.clawhub.ai
+npx clawhub auth login --token <YOUR_TOKEN> --registry https://clawhub.ai
 ```
 
 ### Publish
 
 ```bash
-clawdhub publish ./clawsend \
+npx clawhub publish ./clawsend \
   --slug clawsend \
   --name "ClawSend" \
   --version <VERSION> \
   --changelog "<CHANGELOG>" \
-  --registry https://www.clawhub.ai
+  --registry https://clawhub.ai
 ```
 
 ### Verify
 
 ```bash
-clawdhub whoami --registry https://www.clawhub.ai
+npx clawhub whoami --registry https://clawhub.ai
 ```
 
 ## Development
