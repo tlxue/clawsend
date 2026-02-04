@@ -201,7 +201,8 @@ def sign_json(private_key: Ed25519PrivateKey, data: dict) -> str:
     Returns:
         Base64-encoded signature
     """
-    message = json.dumps(data, sort_keys=True, separators=(',', ':')).encode('utf-8')
+    # ensure_ascii=False keeps unicode as-is (matches Node.js JSON.stringify)
+    message = json.dumps(data, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode('utf-8')
     signature = sign(private_key, message)
     return bytes_to_b64(signature)
 
@@ -243,7 +244,8 @@ def verify_json(public_key: Ed25519PublicKey, data: dict, signature_b64: str) ->
     Raises:
         SignatureError: If verification fails
     """
-    message = json.dumps(data, sort_keys=True, separators=(',', ':')).encode('utf-8')
+    # ensure_ascii=False keeps unicode as-is (matches Node.js JSON.stringify)
+    message = json.dumps(data, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode('utf-8')
     signature = b64_to_bytes(signature_b64)
     return verify(public_key, message, signature)
 
