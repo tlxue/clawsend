@@ -98,16 +98,31 @@ def main():
         # Get sender info for verification
         sender_keys = {}
 
-        def get_sender_key(sender_id: str) -> str:
-            if sender_id in sender_keys:
-                return sender_keys[sender_id]
+        # Cache for sender info (keys and aliases)
+        sender_info_cache = {}
+
+        def get_sender_info(sender_id: str) -> dict:
+            """Get sender's signing key and alias."""
+            if sender_id in sender_info_cache:
+                return sender_info_cache[sender_id]
             try:
                 agents = client.list_agents(limit=500)
                 for agent in agents.get('agents', []):
-                    sender_keys[agent['vault_id']] = agent['signing_public_key']
+                    sender_info_cache[agent['vault_id']] = {
+                        'signing_public_key': agent['signing_public_key'],
+                        'alias': agent.get('alias'),
+                    }
             except Exception:
                 pass
-            return sender_keys.get(sender_id)
+            return sender_info_cache.get(sender_id, {})
+
+        def get_sender_key(sender_id: str) -> str:
+            return get_sender_info(sender_id).get('signing_public_key')
+
+        def get_sender_alias(sender_id: str) -> str:
+            """Get sender's alias, or vault_id if no alias."""
+            info = get_sender_info(sender_id)
+            return info.get('alias') or sender_id
 
         processed = []
 
@@ -117,9 +132,13 @@ def main():
             sender = msg_data['sender']
             encrypted_payload = msg_data.get('encrypted_payload')
 
+            # Resolve sender alias
+            sender_alias = get_sender_alias(sender)
+
             msg_result = {
                 'message_id': msg_data['message_id'],
                 'sender': sender,
+                'sender_alias': sender_alias,
                 'received_at': msg_data['received_at'],
                 'envelope': message['envelope'],
                 'payload': message['payload'],
@@ -172,7 +191,11 @@ def main():
                 for msg in processed:
                     print("\n" + "="*60, file=sys.stderr)
                     print(f"Message ID: {msg['message_id']}", file=sys.stderr)
-                    print(f"From: {msg['sender']}", file=sys.stderr)
+                    # Show alias if different from vault_id
+                    if msg.get('sender_alias') and msg['sender_alias'] != msg['sender']:
+                        print(f"From: {msg['sender_alias']} ({msg['sender']})", file=sys.stderr)
+                    else:
+                        print(f"From: {msg['sender']}", file=sys.stderr)
                     print(f"Intent: {msg['envelope'].get('intent', msg['payload'].get('intent'))}", file=sys.stderr)
                     print(f"Type: {msg['envelope']['type']}", file=sys.stderr)
                     print(f"Received: {msg['received_at']}", file=sys.stderr)
