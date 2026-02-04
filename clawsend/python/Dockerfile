@@ -3,12 +3,12 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Install dependencies
-COPY clawsend/requirements.txt .
+COPY clawsend/python/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY clawsend/lib/ ./lib/
-COPY clawsend/scripts/ ./scripts/
+COPY clawsend/python/lib/ ./lib/
+COPY clawsend/python/scripts/ ./scripts/
 
 # Create data directory for SQLite
 RUN mkdir -p /data

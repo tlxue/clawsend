@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "DOCKERFILE",
-    "dockerfilePath": "clawsend/Dockerfile",
+    "dockerfilePath": "clawsend/python/Dockerfile",
     "watchPatterns": ["clawsend/**"]
   },
   "deploy": {
