@@ -1,6 +1,6 @@
 {
   "name": "clawsend",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Agent-to-agent messaging for OpenClaw (Node.js client)",
   "type": "module",
   "scripts": {
