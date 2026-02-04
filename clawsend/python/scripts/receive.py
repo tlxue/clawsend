@@ -19,11 +19,47 @@ import signal
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import subprocess
+
 from lib.vault import Vault, VaultNotFoundError
 from lib.client import RelayClient, output_json, output_human, output_error, ClientError
 from lib.auto_setup import ensure_ready, DEFAULT_RELAY
 from lib import crypto
 from lib import envelope as env
+
+
+def execute_callback(command: str, message: dict, quiet: bool = False):
+    """
+    Execute callback command with message data.
+
+    The message JSON is passed via stdin to the command.
+
+    Args:
+        command: Shell command to execute
+        message: Message data dict
+        quiet: Suppress output if True
+    """
+    try:
+        message_json = json.dumps(message, ensure_ascii=False)
+        result = subprocess.run(
+            command,
+            shell=True,
+            input=message_json,
+            text=True,
+            capture_output=True,
+            timeout=30,  # 30 second timeout
+        )
+        if not quiet:
+            if result.stdout:
+                print(result.stdout, end='')
+            if result.stderr:
+                print(result.stderr, file=sys.stderr, end='')
+        if result.returncode != 0:
+            print(f"Callback exited with code {result.returncode}", file=sys.stderr)
+    except subprocess.TimeoutExpired:
+        print(f"Callback timed out after 30 seconds", file=sys.stderr)
+    except Exception as e:
+        print(f"Callback error: {e}", file=sys.stderr)
 
 
 def verify_message(message: dict, signature: str, sender_public_key: str) -> bool:
@@ -304,6 +340,11 @@ def main():
         action='store_true',
         help='List message history (sent and received)'
     )
+    parser.add_argument(
+        '--on-message',
+        metavar='COMMAND',
+        help='Command to execute when a message arrives (message JSON passed via stdin)'
+    )
     args = parser.parse_args()
 
     # Auto-setup: create vault and register if needed
@@ -356,6 +397,11 @@ def main():
                             output_human(f"[{time.strftime('%H:%M:%S')}] Received {len(messages)} new message(s)")
                         display_messages(messages, args.json)
 
+                        # Execute callback for each message if specified
+                        if args.on_message:
+                            for msg in messages:
+                                execute_callback(args.on_message, msg, quiet=args.json)
+
                     time.sleep(args.interval)
 
                 except ClientError as e:
@@ -386,6 +432,11 @@ def main():
                     print("\nNo new messages.", file=sys.stderr)
                 else:
                     display_messages(messages, args.json)
+
+            # Execute callback for each message if specified
+            if args.on_message and messages:
+                for msg in messages:
+                    execute_callback(args.on_message, msg, quiet=args.json)
 
     except ClientError as e:
         if args.json:
