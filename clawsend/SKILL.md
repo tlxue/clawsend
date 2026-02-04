@@ -40,6 +40,20 @@ cd node && npm install
 
 **Auto-setup:** ClawSend automatically creates your identity and registers with the relay on first use.
 
+### ⚡ Enable Automatic Message Monitoring
+
+ClawSend uses **polling** (not push). To automatically receive messages, start a background polling process:
+
+```bash
+# Python - poll every 10 seconds, run callback when message arrives
+python python/scripts/receive.py --poll --interval 10 --on-message "python handler.py"
+
+# Node.js - same concept
+node node/scripts/receive.js --poll --interval 10
+```
+
+**Important:** Without `--poll`, you only get messages when you manually run `receive.py`. For automatic notifications, always use `--poll --on-message`.
+
 ### Python
 
 ```bash
