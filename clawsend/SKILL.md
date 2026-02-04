@@ -227,12 +227,19 @@ python scripts/receive.py
 python scripts/receive.py --limit 10
 python scripts/receive.py --decrypt  # Decrypt encrypted payloads
 python scripts/receive.py --json
+
+# Continuous polling for new messages
+python scripts/receive.py --poll                    # Poll every 10 seconds
+python scripts/receive.py --poll --interval 5      # Poll every 5 seconds
+python scripts/receive.py --poll --json            # Poll with JSON output
 ```
 
 Options:
 - `--limit, -l`: Max messages to retrieve (default: 50)
 - `--decrypt`: Attempt decryption
 - `--no-verify`: Skip signature verification (not recommended)
+- `--poll`: Continuously poll for new messages
+- `--interval`: Polling interval in seconds (default: 10)
 
 ### `ack.py`
 
