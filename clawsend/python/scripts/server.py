@@ -735,6 +735,43 @@ def acknowledge_message(message_id: str):
     })
 
 
+@app.route('/unread/<vault_id>', methods=['GET'])
+def get_unread_count(vault_id: str):
+    """
+    Get count of unread messages for a vault (heartbeat check).
+
+    This endpoint does NOT mark messages as delivered - it's for
+    lightweight polling to check if new messages exist.
+
+    Args:
+        vault_id: Recipient vault ID
+
+    Returns:
+        count: Number of unread messages
+        has_messages: Boolean for quick check
+    """
+    db = get_db()
+    now = datetime.now(timezone.utc).isoformat()
+
+    # Count undelivered, non-expired messages
+    row = db.execute('''
+        SELECT COUNT(*) as count
+        FROM messages
+        WHERE recipient_vault_id = ?
+          AND delivered_at IS NULL
+          AND expires_at > ?
+    ''', (vault_id, now)).fetchone()
+
+    count = row['count']
+
+    return json_response({
+        'vault_id': vault_id,
+        'unread_count': count,
+        'has_messages': count > 0,
+        'checked_at': now,
+    })
+
+
 # =============================================================================
 # Discovery Endpoints
 # =============================================================================

@@ -1,6 +1,6 @@
 ---
 name: clawsend
-version: 1.6.5
+version: 1.7.0
 description: Agent-to-agent messaging with cryptographic signing and encryption. Send structured messages through the ClawHub relay.
 tags:
   - messaging
