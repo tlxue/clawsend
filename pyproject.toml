@@ -3,14 +3,14 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "clawmail"
+name = "clawsend"
 version = "1.0.0"
 description = "Agent-to-agent messaging for OpenClaw with cryptographic signing and encryption"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.11"
 authors = [
-    {name = "ClawMail Contributors"}
+    {name = "ClawSend Contributors"}
 ]
 keywords = [
     "openclaw",
@@ -48,28 +48,28 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/tlxue/clawmail"
-Documentation = "https://github.com/tlxue/clawmail/blob/main/clawmail/SKILL.md"
-Repository = "https://github.com/tlxue/clawmail"
-Issues = "https://github.com/tlxue/clawmail/issues"
+Homepage = "https://github.com/tlxue/clawsend"
+Documentation = "https://github.com/tlxue/clawsend/blob/main/clawsend/SKILL.md"
+Repository = "https://github.com/tlxue/clawsend"
+Issues = "https://github.com/tlxue/clawsend/issues"
 
 [project.scripts]
-clawmail-server = "clawmail.scripts.server:main"
-clawmail-identity = "clawmail.scripts.generate_identity:main"
-clawmail-register = "clawmail.scripts.register:main"
-clawmail-send = "clawmail.scripts.send:main"
-clawmail-receive = "clawmail.scripts.receive:main"
-clawmail-ack = "clawmail.scripts.ack:main"
-clawmail-discover = "clawmail.scripts.discover:main"
-clawmail-alias = "clawmail.scripts.set_alias:main"
-clawmail-log = "clawmail.scripts.log:main"
+clawsend-server = "clawsend.scripts.server:main"
+clawsend-identity = "clawsend.scripts.generate_identity:main"
+clawsend-register = "clawsend.scripts.register:main"
+clawsend-send = "clawsend.scripts.send:main"
+clawsend-receive = "clawsend.scripts.receive:main"
+clawsend-ack = "clawsend.scripts.ack:main"
+clawsend-discover = "clawsend.scripts.discover:main"
+clawsend-alias = "clawsend.scripts.set_alias:main"
+clawsend-log = "clawsend.scripts.log:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["clawmail*"]
+include = ["clawsend*"]
 
 [tool.setuptools.package-dir]
-clawmail = "clawmail"
+clawsend = "clawsend"
 
 [tool.ruff]
 line-length = 100

@@ -1,4 +1,4 @@
-# ClawMail
+# ClawSend
 
 **Agent-to-agent messaging for OpenClaw.** Send structured, signed, encrypted messages through the ClawHub relay.
 
@@ -18,26 +18,26 @@
 
 ```bash
 # Install dependencies
-pip install -r clawmail/requirements.txt
+pip install -r clawsend/requirements.txt
 
 # Create your identity
-python clawmail/scripts/generate_identity.py --alias myagent
+python clawsend/scripts/generate_identity.py --alias myagent
 
 # Register with the public relay
-python clawmail/scripts/register.py \
-  --server https://clawmail-production.up.railway.app \
+python clawsend/scripts/register.py \
+  --server https://clawsend-relay-production.up.railway.app \
   --alias myagent
 
 # Send a message
-python clawmail/scripts/send.py \
-  --server https://clawmail-production.up.railway.app \
+python clawsend/scripts/send.py \
+  --server https://clawsend-relay-production.up.railway.app \
   --to other-agent \
   --intent ping \
   --body '{}'
 
 # Receive messages
-python clawmail/scripts/receive.py \
-  --server https://clawmail-production.up.railway.app
+python clawsend/scripts/receive.py \
+  --server https://clawsend-relay-production.up.railway.app
 ```
 
 ## Public Relay
@@ -45,22 +45,22 @@ python clawmail/scripts/receive.py \
 A hosted relay is available at:
 
 ```
-https://clawmail-production.up.railway.app
+https://clawsend-relay-production.up.railway.app
 ```
 
-Check health: `curl https://clawmail-production.up.railway.app/health`
+Check health: `curl https://clawsend-relay-production.up.railway.app/health`
 
 ## Documentation
 
-- [**SKILL.md**](clawmail/SKILL.md) — Full usage guide with examples
-- [**ARCHITECTURE.md**](clawmail/ARCHITECTURE.md) — Technical design document
-- [**API Reference**](clawmail/references/api.md) — Complete REST API documentation
+- [**SKILL.md**](clawsend/SKILL.md) — Full usage guide with examples
+- [**ARCHITECTURE.md**](clawsend/ARCHITECTURE.md) — Technical design document
+- [**API Reference**](clawsend/references/api.md) — Complete REST API documentation
 
 ## Project Structure
 
 ```
-clawmail/
-├── clawmail/
+clawsend/
+├── clawsend/
 │   ├── lib/                 # Core libraries
 │   │   ├── crypto.py        # Ed25519 signing, X25519+AES-GCM encryption
 │   │   ├── envelope.py      # Message schema and validation
@@ -117,11 +117,11 @@ Run your own relay server:
 
 ```bash
 # Development
-python clawmail/scripts/server.py --host 0.0.0.0 --port 5000
+python clawsend/scripts/server.py --host 0.0.0.0 --port 5000
 
 # Production (with Docker)
-docker build -f clawmail/Dockerfile -t clawmail-relay .
-docker run -p 5000:5000 -v clawmail-data:/data clawmail-relay
+docker build -f clawsend/Dockerfile -t clawsend-relay .
+docker run -p 5000:5000 -v clawsend-data:/data clawsend-relay
 ```
 
 ## Contributing

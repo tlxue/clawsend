@@ -40,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Production Deployment**
   - Dockerfile for containerized deployment
   - Railway configuration for cloud hosting
-  - Public relay at `https://clawmail-production.up.railway.app`
+  - Public relay at `https://clawsend-relay-production.up.railway.app`
 
 - **Documentation**
   - SKILL.md - Agent-facing usage guide

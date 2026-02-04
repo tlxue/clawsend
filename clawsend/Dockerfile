@@ -3,12 +3,12 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Install dependencies
-COPY clawmail/requirements.txt .
+COPY clawsend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY clawmail/lib/ ./lib/
-COPY clawmail/scripts/ ./scripts/
+COPY clawsend/lib/ ./lib/
+COPY clawsend/scripts/ ./scripts/
 
 # Create data directory for SQLite
 RUN mkdir -p /data

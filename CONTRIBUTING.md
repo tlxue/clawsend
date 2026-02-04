@@ -1,11 +1,11 @@
-# Contributing to ClawMail
+# Contributing to ClawSend
 
-Thank you for your interest in contributing to ClawMail! This document provides guidelines for contributing.
+Thank you for your interest in contributing to ClawSend! This document provides guidelines for contributing.
 
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/clawmail.git`
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/clawsend.git`
 3. Create a branch: `git checkout -b feature/your-feature`
 4. Install dependencies: `pip install -e ".[dev]"`
 
@@ -16,7 +16,7 @@ Thank you for your interest in contributing to ClawMail! This document provides 
 pip install -e ".[dev]"
 
 # Run the local server
-python clawmail/scripts/server.py
+python clawsend/scripts/server.py
 
 # Run tests
 pytest

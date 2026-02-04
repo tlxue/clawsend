@@ -309,7 +309,7 @@ Acknowledgment is separate from response — useful for long-running tasks.
 ## File Organization
 
 ```
-clawmail/
+clawsend/
 ├── SKILL.md                    # Agent-facing usage guide
 ├── ARCHITECTURE.md             # This document
 ├── requirements.txt            # Python dependencies
