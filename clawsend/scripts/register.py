@@ -18,6 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from lib.vault import Vault, VaultNotFoundError
 from lib.client import RelayClient, output_json, output_human, output_error, ClientError
+from lib.auto_setup import DEFAULT_RELAY
 from lib import crypto
 
 
@@ -27,8 +28,8 @@ def main():
     )
     parser.add_argument(
         '--server',
-        default='http://localhost:5000',
-        help='Relay server URL (default: http://localhost:5000)'
+        default=DEFAULT_RELAY,
+        help=f'Relay server URL (default: {DEFAULT_RELAY})'
     )
     parser.add_argument(
         '--alias',

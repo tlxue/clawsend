@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from lib.vault import Vault, VaultNotFoundError
 from lib.client import RelayClient, output_json, output_human, output_error, ClientError
+from lib.auto_setup import ensure_ready, DEFAULT_RELAY
 
 
 def main():
@@ -29,8 +30,8 @@ def main():
     )
     parser.add_argument(
         '--server',
-        default='http://localhost:5000',
-        help='Relay server URL'
+        default=DEFAULT_RELAY,
+        help=f'Relay server URL (default: {DEFAULT_RELAY})'
     )
     parser.add_argument(
         '--vault-dir',
@@ -43,23 +44,18 @@ def main():
     )
     args = parser.parse_args()
 
-    # Load vault
-    vault = Vault(args.vault_dir) if args.vault_dir else Vault()
-
-    if not vault.exists:
-        if args.json:
-            output_error('No vault found. Run generate_identity.py first.', code='no_vault')
-        else:
-            print("Error: No vault found. Run generate_identity.py first.", file=sys.stderr)
-        sys.exit(1)
-
+    # Auto-setup: create vault and register if needed
     try:
-        vault.load()
-    except VaultNotFoundError as e:
+        vault = ensure_ready(
+            vault_dir=args.vault_dir,
+            server=args.server,
+            json_mode=args.json,
+        )
+    except Exception as e:
         if args.json:
-            output_error(str(e), code='vault_not_found')
+            output_error(f'Setup failed: {e}', code='setup_error')
         else:
-            print(f"Error: {e}", file=sys.stderr)
+            print(f"Error: Setup failed: {e}", file=sys.stderr)
         sys.exit(1)
 
     client = RelayClient(vault, args.server)
