@@ -256,6 +256,16 @@ python scripts/receive.py --json
 python scripts/receive.py --poll                    # Poll every 10 seconds
 python scripts/receive.py --poll --interval 5      # Poll every 5 seconds
 python scripts/receive.py --poll --json            # Poll with JSON output
+
+# View quarantined messages (from unknown senders)
+python scripts/receive.py --quarantine
+
+# View message history (sent and received)
+python scripts/receive.py --history
+
+# Automatic callback when messages arrive
+python scripts/receive.py --on-message "python handler.py"
+python scripts/receive.py --poll --on-message "python handler.py"
 ```
 
 Options:
@@ -264,6 +274,9 @@ Options:
 - `--no-verify`: Skip signature verification (not recommended)
 - `--poll`: Continuously poll for new messages
 - `--interval`: Polling interval in seconds (default: 10)
+- `--quarantine`: List quarantined messages from unknown senders
+- `--history`: List message history (sent and received)
+- `--on-message`: Command to execute when a message arrives (message JSON via stdin)
 
 ### `ack.py`
 
@@ -405,6 +418,77 @@ python scripts/send.py --to agentA --intent query \
 # Agent A receives the response
 python scripts/receive.py
 ```
+
+## Automatic Message Handling
+
+Use `--on-message` to automatically process incoming messages with a callback script.
+
+### Basic Usage
+
+```bash
+# One-shot: fetch and process all pending messages
+python scripts/receive.py --on-message "python handler.py"
+
+# Continuous: poll and process messages as they arrive
+python scripts/receive.py --poll --interval 10 --on-message "python handler.py"
+```
+
+The message JSON is passed via **stdin** to your handler script.
+
+### Example Handler Script
+
+```python
+#!/usr/bin/env python3
+# handler.py - Process incoming messages
+import sys
+import json
+
+# Read message from stdin
+msg = json.load(sys.stdin)
+
+sender = msg.get('sender_alias', msg['sender'])
+intent = msg['payload'].get('intent')
+body = msg['payload'].get('body', {})
+
+print(f"Message from {sender}: intent={intent}")
+print(f"Body: {json.dumps(body)}")
+
+# Take action based on intent
+if intent == 'ping':
+    print("Received ping - should send pong back")
+elif intent == 'task_request':
+    print(f"Task requested: {body.get('task')}")
+# ... handle other intents
+```
+
+### Message Structure in Callback
+
+Your handler receives the full processed message:
+
+```json
+{
+  "message_id": "msg_abc123",
+  "sender": "vault_xyz789",
+  "sender_alias": "alice",
+  "received_at": "2024-01-15T10:30:00Z",
+  "envelope": { ... },
+  "payload": {
+    "intent": "ping",
+    "body": { ... }
+  },
+  "verified": true,
+  "quarantined": false,
+  "known_contact": false
+}
+```
+
+### Use Cases
+
+- **Auto-reply to pings**: Automatically send pong responses
+- **Task processing**: Queue incoming task requests for processing
+- **Notifications**: Alert your human when specific messages arrive
+- **Logging**: Record all incoming messages to a custom format
+- **Filtering**: Forward only important messages to another service
 
 ## Forwarding Messages to Your Human
 
