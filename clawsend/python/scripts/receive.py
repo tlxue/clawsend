@@ -151,6 +151,65 @@ def fetch_and_process_messages(client, vault, args, sender_info_cache):
     return processed
 
 
+def display_quarantine(vault, json_mode, limit=50):
+    """Display quarantined messages."""
+    quarantined = vault.get_quarantine(limit=limit)
+
+    if json_mode:
+        output_json({
+            'quarantine': quarantined,
+            'count': len(quarantined),
+        })
+    else:
+        if not quarantined:
+            print("\nNo quarantined messages.", file=sys.stderr)
+            return
+
+        print(f"\nQuarantined messages ({len(quarantined)}):", file=sys.stderr)
+        for entry in quarantined:
+            print("\n" + "="*60, file=sys.stderr)
+            msg = entry.get('message', {})
+            envelope = msg.get('envelope', {})
+            payload = msg.get('payload', {})
+            print(f"Message ID: {envelope.get('id', 'unknown')}", file=sys.stderr)
+            print(f"From: {envelope.get('sender', 'unknown')}", file=sys.stderr)
+            print(f"Intent: {payload.get('intent', 'unknown')}", file=sys.stderr)
+            print(f"Quarantined: {entry.get('quarantined_at', 'unknown')}", file=sys.stderr)
+            print(f"Reason: {entry.get('reason', 'unknown')}", file=sys.stderr)
+            print(f"Body: {json.dumps(payload.get('body'), indent=2)}", file=sys.stderr)
+
+
+def display_history(vault, json_mode, limit=50):
+    """Display message history."""
+    history = vault.get_history(limit=limit)
+
+    if json_mode:
+        output_json({
+            'history': history,
+            'count': len(history),
+        })
+    else:
+        if not history:
+            print("\nNo message history.", file=sys.stderr)
+            return
+
+        print(f"\nMessage history ({len(history)}):", file=sys.stderr)
+        for entry in history:
+            print("\n" + "="*60, file=sys.stderr)
+            msg = entry.get('message', {})
+            envelope = msg.get('envelope', {})
+            payload = msg.get('payload', {})
+            direction = entry.get('direction', 'unknown')
+            print(f"[{direction.upper()}] Message ID: {envelope.get('id', 'unknown')}", file=sys.stderr)
+            if direction == 'sent':
+                print(f"To: {envelope.get('recipient', 'unknown')}", file=sys.stderr)
+            else:
+                print(f"From: {envelope.get('sender', 'unknown')}", file=sys.stderr)
+            print(f"Intent: {payload.get('intent', 'unknown')}", file=sys.stderr)
+            print(f"Saved: {entry.get('saved_at', 'unknown')}", file=sys.stderr)
+            print(f"Body: {json.dumps(payload.get('body'), indent=2)}", file=sys.stderr)
+
+
 def display_messages(messages, json_mode):
     """Display processed messages."""
     if json_mode:
@@ -235,6 +294,16 @@ def main():
         default=10,
         help='Polling interval in seconds (default: 10)'
     )
+    parser.add_argument(
+        '--quarantine',
+        action='store_true',
+        help='List quarantined messages from unknown senders'
+    )
+    parser.add_argument(
+        '--history',
+        action='store_true',
+        help='List message history (sent and received)'
+    )
     args = parser.parse_args()
 
     # Auto-setup: create vault and register if needed
@@ -250,6 +319,16 @@ def main():
         else:
             print(f"Error: Setup failed: {e}", file=sys.stderr)
         sys.exit(1)
+
+    # Handle --quarantine flag: list quarantined messages and exit
+    if args.quarantine:
+        display_quarantine(vault, args.json, limit=args.limit)
+        sys.exit(0)
+
+    # Handle --history flag: list message history and exit
+    if args.history:
+        display_history(vault, args.json, limit=args.limit)
+        sys.exit(0)
 
     client = RelayClient(vault, args.server)
 
