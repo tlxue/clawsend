@@ -582,12 +582,14 @@ def receive_messages(vault_id: str):
 
     Query params:
         limit: Max messages to return (default 50)
+        debug: If true, include debug info
 
     Returns:
         messages: List of messages
     """
     limit = request.args.get('limit', 50, type=int)
     limit = min(limit, 100)  # Cap at 100
+    debug = request.args.get('debug', 'false').lower() == 'true'
 
     db = get_db()
     now = datetime.now(timezone.utc).isoformat()
@@ -602,6 +604,55 @@ def receive_messages(vault_id: str):
         ORDER BY created_at ASC
         LIMIT ?
     ''', (vault_id, now, limit)).fetchall()
+
+    # Debug: count all messages for this recipient
+    debug_info = None
+    if debug:
+        total = db.execute(
+            'SELECT COUNT(*) as c FROM messages WHERE recipient_vault_id = ?',
+            (vault_id,)
+        ).fetchone()['c']
+        delivered = db.execute(
+            'SELECT COUNT(*) as c FROM messages WHERE recipient_vault_id = ? AND delivered_at IS NOT NULL',
+            (vault_id,)
+        ).fetchone()['c']
+        expired = db.execute(
+            'SELECT COUNT(*) as c FROM messages WHERE recipient_vault_id = ? AND expires_at <= ?',
+            (vault_id, now)
+        ).fetchone()['c']
+        pending = db.execute(
+            'SELECT COUNT(*) as c FROM messages WHERE recipient_vault_id = ? AND delivered_at IS NULL AND expires_at > ?',
+            (vault_id, now)
+        ).fetchone()['c']
+
+        # Show sample of recent messages for this recipient
+        recent_msgs = db.execute('''
+            SELECT id, sender_vault_id, created_at, expires_at, delivered_at
+            FROM messages
+            WHERE recipient_vault_id = ?
+            ORDER BY created_at DESC
+            LIMIT 5
+        ''', (vault_id,)).fetchall()
+
+        # Also check if there are messages with similar vault IDs (prefix match)
+        similar_recipients = db.execute('''
+            SELECT DISTINCT recipient_vault_id, COUNT(*) as msg_count
+            FROM messages
+            WHERE recipient_vault_id LIKE ?
+            GROUP BY recipient_vault_id
+            LIMIT 10
+        ''', (vault_id[:20] + '%',)).fetchall()
+
+        debug_info = {
+            'requested_vault_id': vault_id,
+            'total_messages': total,
+            'already_delivered': delivered,
+            'expired': expired,
+            'pending_available': pending,
+            'current_time': now,
+            'recent_messages': [dict(row) for row in recent_msgs],
+            'similar_recipients': [{'vault_id': row['recipient_vault_id'], 'count': row['msg_count']} for row in similar_recipients],
+        }
 
     messages = []
     message_ids = []
@@ -627,10 +678,14 @@ def receive_messages(vault_id: str):
         ''', [now] + message_ids)
         db.commit()
 
-    return json_response({
+    response = {
         'messages': messages,
         'count': len(messages),
-    })
+    }
+    if debug_info:
+        response['debug'] = debug_info
+
+    return json_response(response)
 
 
 @app.route('/ack/<message_id>', methods=['POST'])
